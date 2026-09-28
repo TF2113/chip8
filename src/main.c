@@ -50,6 +50,8 @@ bool create_window(void) {
 
 int main(int argc, char **argv) {
 
+    chip8_initialise();
+
     if(!init_sdl()) {
         return 1;
     }

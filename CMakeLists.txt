@@ -9,6 +9,7 @@ add_executable(chip8)
 target_sources(chip8
     PRIVATE
         src/main.c
+        src/chip8.c
 )
 
 target_link_libraries(chip8 PRIVATE SDL2::SDL2)
