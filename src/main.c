@@ -48,9 +48,18 @@ bool create_window(void) {
     return true;
 }
 
-int main(int argc, char **argv) {
+int main(int argc, char *argv[]) {
+
+    if(argc != 2){
+        printf("Usage: ./build/chip8 {ROM_PATH}");
+        return 1;
+    }
 
     chip8_initialise();
+
+    if(!load_rom(argv[1])){
+        return 1;
+    }
 
     if(!init_sdl()) {
         return 1;
