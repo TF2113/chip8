@@ -50,14 +50,14 @@ bool create_window(void) {
 
 int main(int argc, char *argv[]) {
 
-    if(argc != 2){
+    if(argc != 2) {
         printf("Usage: ./build/chip8 {ROM_PATH}");
         return 1;
     }
 
     chip8_initialise();
 
-    if(!load_rom(argv[1])){
+    if(!load_rom(argv[1])) {
         return 1;
     }
 

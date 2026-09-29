@@ -1,7 +1,7 @@
 #include "chip8.h"
-#include <stdlib.h>
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 static unsigned short opcode; // 2 byte opcode
 static unsigned short stack[16];
@@ -74,23 +74,23 @@ void chip8_initialise() {
     printf("Chip8 Successfully initialised\n");
 }
 
-bool load_rom(const char* file_path){
+bool load_rom(const char *file_path) {
 
-    FILE* rom;
+    FILE *rom;
 
-    if(file_path == NULL){
+    if(file_path == NULL) {
         printf("ROM cannot be NULL\n");
         return false;
     }
 
     rom = fopen(file_path, "rb");
 
-    if(rom == NULL){
+    if(rom == NULL) {
         printf("Not able to open file\n");
         return false;
     }
 
-    if(fseek(rom, 0, SEEK_END) != 0){
+    if(fseek(rom, 0, SEEK_END) != 0) {
         printf("fseek failed\n");
         fclose(rom);
         return false;
@@ -98,7 +98,7 @@ bool load_rom(const char* file_path){
 
     long rom_size = ftell(rom);
 
-    if(rom_size == -1L){
+    if(rom_size == -1L) {
         printf("ftell failed\n");
         fclose(rom);
         return false;
@@ -106,7 +106,7 @@ bool load_rom(const char* file_path){
 
     rewind(rom);
 
-    if(rom_size > 512 || rom_size <= 0 ){
+    if(rom_size > 512 || rom_size <= 0) {
         printf("ROM size error, max size 512b\n");
         fclose(rom);
         return false;
@@ -114,7 +114,7 @@ bool load_rom(const char* file_path){
 
     size_t store_rom = fread(memory + 0x200, 1, rom_size, rom);
 
-    if(store_rom != rom_size){
+    if(store_rom != rom_size) {
         printf("Failed to read ROM\n");
         fclose(rom);
         return false;
@@ -122,5 +122,4 @@ bool load_rom(const char* file_path){
 
     fclose(rom);
     return true;
-
 }
