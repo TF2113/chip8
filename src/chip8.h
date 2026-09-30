@@ -8,5 +8,6 @@ extern unsigned char gfx[];
 
 void chip8_initialise(void);
 bool load_rom(const char *file_path);
+void chip8_cycle();
 
 #endif

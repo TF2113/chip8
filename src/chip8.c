@@ -123,3 +123,45 @@ bool load_rom(const char *file_path) {
     fclose(rom);
     return true;
 }
+
+void chip8_cycle() {
+
+    // fetch opcode
+    opcode = memory[pc] << 8 |
+             memory[pc + 1]; // opcodes are 2 bytes, merge current byte and next
+                             // byte with OR operation
+
+    // decode opcode
+    switch(opcode & 0xF000) { // checks first digit
+
+    case 0x0000: // first hex digit is 0
+        switch(opcode) {
+
+        case 0x00E0: // 0x00E0: Clear Screen
+
+            for(int i = 0; i < 2048; i++) {
+                gfx[i] = 0;
+            }
+            
+            bool drawFlag = true; // set display to be redrawn
+                                  // to be implemented
+            pc += 2;
+            printf("Clear Screen ran\n");
+            break;
+        }
+
+    case 0x1000: // 0x1XXX: Jump
+        break;
+    default:
+        printf("Unknown Opcode\n");
+    }
+
+    if(delay_timer > 0)
+        --delay_timer;
+
+    if(sound_timer > 0) {
+        if(sound_timer == 1)
+            printf("BEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEP!\n");
+        --sound_timer;
+    }
+}
