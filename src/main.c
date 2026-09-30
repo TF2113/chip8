@@ -2,6 +2,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "chip8.h"
 
@@ -42,7 +43,7 @@ bool create_window(void) {
     }
 
     SDL_FillRect(screenSurface, NULL,
-                 SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
+                 SDL_MapRGB(screenSurface->format, 0, 0, 0));
     SDL_UpdateWindowSurface(window);
 
     return true;
@@ -78,6 +79,8 @@ int main(int argc, char *argv[]) {
                 quit = 1;
             }
         }
+        chip8_cycle();
+        usleep(16666);
     }
 
     SDL_DestroyWindow(window);
