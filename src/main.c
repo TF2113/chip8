@@ -49,6 +49,20 @@ bool create_window(void) {
     return true;
 }
 
+void drawGraphics() {
+    for(int y = 0; y < SCREEN_HEIGHT; y++) {
+        for(int x = 0; x < SCREEN_WIDTH; x++) {
+            if(gfx[y * SCREEN_WIDTH + x] != 0) {
+                SDL_Rect pixel = {x * PIXEL_SCALE, y * PIXEL_SCALE, PIXEL_SCALE,
+                                  PIXEL_SCALE};
+                SDL_FillRect(screenSurface, &pixel,
+                             SDL_MapRGB(screenSurface->format, 255, 255, 255));
+            }
+        }
+    }
+    SDL_UpdateWindowSurface(window);
+}
+
 int main(int argc, char *argv[]) {
 
     if(argc != 2) {
@@ -80,6 +94,12 @@ int main(int argc, char *argv[]) {
             }
         }
         chip8_cycle();
+
+        if(drawFlag) {
+            drawFlag = false;
+            drawGraphics();
+        }
+
         usleep(16666);
     }
 

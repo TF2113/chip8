@@ -5,6 +5,7 @@
 
 extern unsigned char keypad[];
 extern unsigned char gfx[];
+extern bool drawFlag;
 
 void chip8_initialise(void);
 bool load_rom(const char *file_path);

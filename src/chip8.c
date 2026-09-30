@@ -14,6 +14,7 @@ static unsigned short pc;   // program counter
 
 static unsigned char delay_timer;
 static unsigned char sound_timer;
+bool drawFlag;
 
 unsigned char keypad[16];
 unsigned char gfx[64 * 32]; // 2048 pixel count
@@ -142,16 +143,58 @@ void chip8_cycle() {
             for(int i = 0; i < 2048; i++) {
                 gfx[i] = 0;
             }
-            
-            bool drawFlag = true; // set display to be redrawn
-                                  // to be implemented
+
+            drawFlag = true; // set display to be redrawn
+                             // to be implemented
             pc += 2;
             printf("Clear Screen ran\n");
             break;
         }
-
-    case 0x1000: // 0x1XXX: Jump
         break;
+
+    case 0x1000: // 0x1NNN: Jump
+        pc = opcode & 0x0FFF;
+        printf("JUMPED to %d\n", pc);
+        break;
+
+    case 0x6000: // 0x6XNN: Set Register V[X] to NN
+        V[(opcode & 0x0F00) >> 8] = opcode & 0x00FF;
+        pc += 2;
+        break;
+
+    case 0x7000: // 0x7XNN: Add NN to register V[X]
+        V[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
+        pc += 2;
+        break;
+
+    case 0xA000: // 0xANNN: Set index to NNN
+        I = opcode & 0x0FFF;
+        pc += 2;
+        break;
+
+    case 0xD000: // 0xDXYN: Draw display (Credit to James Griffin, I was lost in the sauce (https://github.com/JamesGriffin/CHIP-8-Emulator))
+        unsigned short xCord = V[(opcode & 0x0F00) >> 8];
+        unsigned short yCord = V[(opcode & 0x00F0) >> 4];
+        unsigned short rowCount = opcode & 0x000F;
+        unsigned short currentPixel;
+        V[0xF] = 0;
+
+        for(int i = 0; i < rowCount; i++) {
+            currentPixel = memory[I + i];
+            for(int j = 0; j < 8; j++) {
+                if((currentPixel & (0x80 >> j)) != 0) {
+                    if(gfx[(xCord + j) + ((yCord + i) * 64)] == 1) {
+                        V[0xF] = 1;
+                    }
+                    gfx[(xCord + j) + ((yCord + i) * 64)] ^= 1;
+                }
+            }
+        }
+
+        drawFlag = true;
+        pc += 2;
+        break;
+
     default:
         printf("Unknown Opcode\n");
     }
