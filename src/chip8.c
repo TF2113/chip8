@@ -1,11 +1,10 @@
 #include "chip8.h"
+#include "stack.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-static unsigned short opcode; // 2 byte opcode
-static unsigned short stack[16];
-static unsigned short stack_pointer;
+static unsigned short opcode;      // 2 byte opcode
 static unsigned char memory[4096]; // 4KB memory
 
 static unsigned char V[16]; // 15 registers + 1 'carry flag'
@@ -38,11 +37,15 @@ unsigned char fontset[80] = {
     0xF0, 0x80, 0xF0, 0x80, 0x80  // F
 };
 
+Stack stack;
+unsigned short prevAddr;
+
 void chip8_initialise() {
     pc = 0x200;
     opcode = 0;
     I = 0;
-    stack_pointer = 0;
+
+    create_stack(&stack);
 
     // clear display
     for(int i = 0; i < 2048; i++) {
@@ -51,7 +54,7 @@ void chip8_initialise() {
 
     // clear stack
     for(int i = 0; i < 16; i++) {
-        stack[i] = 0;
+        stack.element[i] = 0;
     }
 
     // clear registers
@@ -145,9 +148,13 @@ void chip8_cycle() {
             }
 
             drawFlag = true; // set display to be redrawn
-                             // to be implemented
             pc += 2;
             printf("Clear Screen ran\n");
+            break;
+
+        case 0x00EE: // 0x00EE: Return from subroutine
+            pop(&stack, &prevAddr);
+            pc = prevAddr + 2;
             break;
         }
         break;
@@ -155,6 +162,11 @@ void chip8_cycle() {
     case 0x1000: // 0x1NNN: Jump
         pc = opcode & 0x0FFF;
         printf("JUMPED to %d\n", pc);
+        break;
+
+    case 0x2000: // 0x2NNN: Call subroutine at NNN
+        push(&stack, pc);
+        pc = opcode & 0x0FFF;
         break;
 
     case 0x6000: // 0x6XNN: Set Register V[X] to NN
@@ -172,7 +184,8 @@ void chip8_cycle() {
         pc += 2;
         break;
 
-    case 0xD000: // 0xDXYN: Draw display (Credit to James Griffin, I was lost in the sauce (https://github.com/JamesGriffin/CHIP-8-Emulator))
+    case 0xD000: // 0xDXYN: Draw display (Credit to James Griffin, I was lost in
+                 // the sauce (https://github.com/JamesGriffin/CHIP-8-Emulator))
         unsigned short xCord = V[(opcode & 0x0F00) >> 8];
         unsigned short yCord = V[(opcode & 0x00F0) >> 4];
         unsigned short rowCount = opcode & 0x000F;
