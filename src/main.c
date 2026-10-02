@@ -13,7 +13,7 @@ const int PIXEL_SCALE = 10; // increase scale for modern displays
 
 // SDL declarations
 SDL_Window *window = NULL;
-SDL_Surface *screenSurface = NULL;
+SDL_Renderer *renderer = NULL;
 
 bool init_sdl(void) {
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -24,27 +24,16 @@ bool init_sdl(void) {
     return true;
 }
 
-bool create_window(void) {
-    window =
-        SDL_CreateWindow("Chip8", SDL_WINDOWPOS_CENTERED,
-                         SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH * PIXEL_SCALE,
-                         SCREEN_HEIGHT * PIXEL_SCALE, SDL_WINDOW_SHOWN);
-    if(window == NULL) {
+bool create_window_and_renderer(void) {
+    if(SDL_CreateWindowAndRenderer(SCREEN_WIDTH * PIXEL_SCALE,
+                                   SCREEN_HEIGHT * PIXEL_SCALE, 0, &window,
+                                   &renderer) != 0) {
         printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
         return false;
     }
 
-    screenSurface = SDL_GetWindowSurface(window);
-    if(screenSurface == NULL) {
-        printf("Could not get window surface: %s\n", SDL_GetError());
-        SDL_DestroyWindow(window);
-        window = NULL;
-        return false;
-    }
-
-    SDL_FillRect(screenSurface, NULL,
-                 SDL_MapRGB(screenSurface->format, 0, 0, 0));
-    SDL_UpdateWindowSurface(window);
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
 
     return true;
 }
@@ -53,10 +42,10 @@ void drawGraphics() {
     for(int y = 0; y < SCREEN_HEIGHT; y++) {
         for(int x = 0; x < SCREEN_WIDTH; x++) {
             if(gfx[y * SCREEN_WIDTH + x] != 0) {
-                SDL_Rect pixel = {x * PIXEL_SCALE, y * PIXEL_SCALE, PIXEL_SCALE,
-                                  PIXEL_SCALE};
-                SDL_FillRect(screenSurface, &pixel,
-                             SDL_MapRGB(screenSurface->format, 255, 255, 255));
+                SDL_Rect pixel = {x * PIXEL_SCALE, y * PIXEL_SCALE, PIXEL_SCALE, PIXEL_SCALE};
+                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_RenderFillRect(renderer, &pixel);
+                SDL_RenderPresent(renderer);
             }
         }
     }
@@ -80,7 +69,7 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    if(!create_window()) {
+    if(!create_window_and_renderer()) {
         SDL_Quit();
         return 1;
     }
