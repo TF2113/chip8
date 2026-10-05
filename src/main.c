@@ -15,6 +15,11 @@ const int PIXEL_SCALE = 10; // increase scale for modern displays
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 
+// timing values
+const int INSTRUCTIONS_PER_CYCLE_IN_US = 1429; // 700 instructions per second in microseconds
+const int TIMERS_DECREMENT_COUNTER = 12; // 60 decrements per second = (16666us / 1429us = 11.66, rounded up for simplicity) 
+int chip8_cycle_counter = 0;
+
 bool init_sdl(void) {
     if(SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL could not initialise! SDL Error: %s\n", SDL_GetError());
@@ -89,7 +94,14 @@ int main(int argc, char *argv[]) {
             drawGraphics();
         }
 
-        usleep(16666);
+        usleep(INSTRUCTIONS_PER_CYCLE_IN_US);
+        chip8_cycle_counter++;
+
+        if(chip8_cycle_counter == TIMERS_DECREMENT_COUNTER){
+            decrement_timers();
+            chip8_cycle_counter = 0;
+        }
+
     }
 
     SDL_DestroyWindow(window);
