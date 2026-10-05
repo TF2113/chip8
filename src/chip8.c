@@ -13,8 +13,8 @@ static unsigned short pc;   // program counter
 
 static unsigned char delay_timer;
 static unsigned char sound_timer;
-bool drawFlag;
 
+bool drawFlag;
 unsigned char keypad[16];
 unsigned char gfx[64 * 32]; // 2048 pixel count
 
@@ -211,13 +211,14 @@ void chip8_cycle() {
     default:
         printf("Unknown Opcode\n");
     }
+}
 
+void decrement_timers(){
     if(delay_timer > 0)
         --delay_timer;
 
     if(sound_timer > 0) {
-        if(sound_timer == 1)
-            printf("BEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEP!\n");
+        printf("BEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEP!\n");
         --sound_timer;
     }
 }
