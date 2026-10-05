@@ -23,8 +23,8 @@ void push(Stack *stack, unsigned short new_value) {
     stack->element[++stack->top] = new_value;
 }
 
-bool pop(Stack *stack, unsigned short *popped_value){
-    if(isEmpty(stack)){
+bool pop(Stack *stack, unsigned short *popped_value) {
+    if(isEmpty(stack)) {
         printf("Stack is empty\n");
         return false;
     }

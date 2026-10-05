@@ -16,8 +16,11 @@ SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
 
 // timing values
-const int INSTRUCTIONS_PER_CYCLE_IN_US = 1429; // 700 instructions per second in microseconds
-const int TIMERS_DECREMENT_COUNTER = 12; // 60 decrements per second = (16666us / 1429us = 11.66, rounded up for simplicity) 
+const int INSTRUCTIONS_PER_CYCLE_IN_US =
+    1429; // 700 instructions per second in microseconds
+const int TIMERS_DECREMENT_COUNTER =
+    12; // 60 decrements per second = (16666us / 1429us = 11.66, rounded up for
+        // simplicity)
 int chip8_cycle_counter = 0;
 
 bool init_sdl(void) {
@@ -47,7 +50,8 @@ void drawGraphics() {
     for(int y = 0; y < SCREEN_HEIGHT; y++) {
         for(int x = 0; x < SCREEN_WIDTH; x++) {
             if(gfx[y * SCREEN_WIDTH + x] != 0) {
-                SDL_Rect pixel = {x * PIXEL_SCALE, y * PIXEL_SCALE, PIXEL_SCALE, PIXEL_SCALE};
+                SDL_Rect pixel = {x * PIXEL_SCALE, y * PIXEL_SCALE, PIXEL_SCALE,
+                                  PIXEL_SCALE};
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                 SDL_RenderFillRect(renderer, &pixel);
                 SDL_RenderPresent(renderer);
@@ -97,11 +101,10 @@ int main(int argc, char *argv[]) {
         usleep(INSTRUCTIONS_PER_CYCLE_IN_US);
         chip8_cycle_counter++;
 
-        if(chip8_cycle_counter == TIMERS_DECREMENT_COUNTER){
+        if(chip8_cycle_counter == TIMERS_DECREMENT_COUNTER) {
             decrement_timers();
             chip8_cycle_counter = 0;
         }
-
     }
 
     SDL_DestroyWindow(window);

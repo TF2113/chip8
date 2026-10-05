@@ -170,21 +170,21 @@ void chip8_cycle() {
         break;
 
     case 0x3000: // 0x3NNN: Skip instruction if VX == NN
-        if((V[(opcode & 0x0F00) >> 8]) == (opcode & 0x00FF)){
+        if((V[(opcode & 0x0F00) >> 8]) == (opcode & 0x00FF)) {
             pc += 2;
         }
         pc += 2;
         break;
 
     case 0x4000: // 0x4NNN: Skip instruction if VX != NN
-        if((V[(opcode & 0x0F00) >> 8]) != (opcode & 0x00FF)){
+        if((V[(opcode & 0x0F00) >> 8]) != (opcode & 0x00FF)) {
             pc += 2;
         }
         pc += 2;
         break;
 
     case 0x5000: // 0x5XY0: Skip instruction if VX == VY
-        if((V[(opcode & 0x0F00) >> 8]) == (V[(opcode & 0x00F0) >> 4])){
+        if((V[(opcode & 0x0F00) >> 8]) == (V[(opcode & 0x00F0) >> 4])) {
             pc += 2;
         }
         pc += 2;
@@ -201,7 +201,7 @@ void chip8_cycle() {
         break;
 
     case 0x9000: // 0x9XY0: Skip instruction if VX != VY
-        if((V[(opcode & 0x0F00) >> 8]) != (V[(opcode & 0x00F0) >> 4])){
+        if((V[(opcode & 0x0F00) >> 8]) != (V[(opcode & 0x00F0) >> 4])) {
             pc += 2;
         }
         pc += 2;
@@ -241,7 +241,7 @@ void chip8_cycle() {
     }
 }
 
-void decrement_timers(){
+void decrement_timers() {
     if(delay_timer > 0)
         --delay_timer;
 
