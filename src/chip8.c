@@ -169,6 +169,27 @@ void chip8_cycle() {
         pc = opcode & 0x0FFF;
         break;
 
+    case 0x3000: // 0x3NNN: Skip instruction if VX == NN
+        if((V[(opcode & 0x0F00) >> 8]) == (opcode & 0x00FF)){
+            pc += 2;
+        }
+        pc += 2;
+        break;
+
+    case 0x4000: // 0x4NNN: Skip instruction if VX != NN
+        if((V[(opcode & 0x0F00) >> 8]) != (opcode & 0x00FF)){
+            pc += 2;
+        }
+        pc += 2;
+        break;
+
+    case 0x5000: // 0x5XY0: Skip instruction if VX == VY
+        if((V[(opcode & 0x0F00) >> 8]) == (V[(opcode & 0x00F0) >> 4])){
+            pc += 2;
+        }
+        pc += 2;
+        break;
+
     case 0x6000: // 0x6XNN: Set Register V[X] to NN
         V[(opcode & 0x0F00) >> 8] = opcode & 0x00FF;
         pc += 2;
@@ -176,6 +197,13 @@ void chip8_cycle() {
 
     case 0x7000: // 0x7XNN: Add NN to register V[X]
         V[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
+        pc += 2;
+        break;
+
+    case 0x9000: // 0x9XY0: Skip instruction if VX != VY
+        if((V[(opcode & 0x0F00) >> 8]) != (V[(opcode & 0x00F0) >> 4])){
+            pc += 2;
+        }
         pc += 2;
         break;
 
