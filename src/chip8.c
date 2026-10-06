@@ -356,6 +356,12 @@ void chip8_cycle() {
             pc += 2;
             break;
 
+        case 0xF029: // 0xFX29: Set I to the fontset address of the hex char
+                     // stored in VX
+            I = V[(opcode & 0x0F00) >> 8] * 5;
+            pc += 2;
+            break;
+
         case 0xF033: // 0xFX33: Convert value of VX into 3 digits, e.g 255 in 2,
                      // 5, 5, and store into memory starting at I
             memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
