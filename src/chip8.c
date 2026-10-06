@@ -308,6 +308,16 @@ void chip8_cycle() {
         pc += 2;
         break;
 
+    case 0xB000: // 0xBNNN: Jump to NNN + value in V0
+        pc = ((opcode & 0x0FFF) + V[0]);
+        break;
+
+    case 0xC000: // 0xCXNN: Generate a random value, binary AND with NN and
+                 // store in VX
+        V[(opcode & 0x0F00) >> 8] = ((rand() % 256) & (opcode & 0x00FF));
+        pc += 2;
+        break;
+
     case 0xD000: // 0xDXYN: Draw display (Credit to James Griffin, I was lost in
                  // the sauce (https://github.com/JamesGriffin/CHIP-8-Emulator))
         unsigned short xCord = V[(opcode & 0x0F00) >> 8];
@@ -332,7 +342,29 @@ void chip8_cycle() {
         pc += 2;
         break;
 
-    case 0xF000: // Pair of instruction store or load registers from memory
+    case 0xE000: // Pair of instructions to skip instruction if key is pressed
+                 // or not
+        switch(opcode & 0xF0FF) {
+
+        case 0xE09E: // 0xEX9E: Skip one instruction if key corresponding to VX
+                     // is pressed
+            if(keypad[V[(opcode & 0x0F00) >> 8]] != 0) {
+                pc += 2;
+            }
+            pc += 2;
+            break;
+
+        case 0xE0A1: // 0xEXA1: Skip one instruction if key corresponding to VX
+                     // is not pressed
+            if(keypad[V[(opcode & 0x0F00) >> 8]] != 1) {
+                pc += 2;
+            }
+            pc += 2;
+            break;
+        }
+        break;
+
+    case 0xF000: // Pair of instructions to store or load registers from memory
         unsigned short end = (opcode & 0x0F00) >> 8;
         switch(opcode & 0xF0FF) {
 
@@ -349,6 +381,17 @@ void chip8_cycle() {
         case 0xF018: // 0xFX18: Set sound timer to current value of VX
             sound_timer = V[(opcode & 0x0F00) >> 8];
             pc += 2;
+            break;
+
+        case 0xF00A: // 0xFX0A: Pauses instructions until a key is pressed, when
+                     // pressed store the key hex value in VX
+            for(int i = 0; i < 16; i++) {
+                if(keypad[i] == 1) {
+                    V[(opcode & 0x0F00) >> 8] = i;
+                    pc += 2;
+                    break;
+                }
+            }
             break;
 
         case 0xF01E: // 0xFX1E: Add value of VX to I
