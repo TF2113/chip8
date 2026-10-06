@@ -235,24 +235,27 @@ void chip8_cycle() {
 
         case 0x8004: // 0x8XY4: Add value of VY to VX, if VX overflows set VF =
                      // 1
+            VX += VY;
+            V[(opcode & 0x0F00) >> 8] = VX;
+
             V[0xF] = 0;
             if((VX + VY) > 255) {
                 V[0xF] = 1;
             }
-
-            VX += VY;
-            V[(opcode & 0x0F00) >> 8] = VX;
             pc += 2;
             break;
 
         case 0x8005: // 0x8XY5: Subtract value of VY from VX and store in VX
-            V[0xF] = 0;
             if(VX >= VY) {
+                VX -= VY;
+                V[(opcode & 0x0F00) >> 8] = VX;
                 V[0xF] = 1;
+            } else {
+                VX -= VY;
+                V[(opcode & 0x0F00) >> 8] = VX;
+                V[0xF] = 0;
             }
 
-            VX = VX - VY;
-            V[(opcode & 0x0F00) >> 8] = VX;
             pc += 2;
             break;
 
@@ -269,13 +272,13 @@ void chip8_cycle() {
             break;
 
         case 0x8007: // 0x8XY7: Subtract value of VX from VY and store in VX
+            VX = VY - VX;
+            V[(opcode & 0x0F00) >> 8] = VX;
+
             V[0xF] = 0;
             if(VY >= VX) {
                 V[0xF] = 1;
             }
-
-            VX = VY - VX;
-            V[(opcode & 0x0F00) >> 8] = VX;
             pc += 2;
             break;
 
@@ -285,7 +288,7 @@ void chip8_cycle() {
             V[(opcode & 0x0F00) >> 8] = VX;
 
             V[0xF] = 0;
-            if((VY & 1) == 1) {
+            if((VY >> 7) == 1) {
                 V[0xF] = 1;
             }
             pc += 2;
@@ -327,6 +330,34 @@ void chip8_cycle() {
 
         drawFlag = true;
         pc += 2;
+        break;
+
+    case 0xF000: // Pair of instruction store or load registers from memory
+        unsigned short end = (opcode & 0x0F00) >> 8;
+        switch(opcode & 0xF0FF) {
+
+        case 0xF01E: // 0xFX1E: Add value of VX to I
+            I += V[(opcode & 0x0F00) >> 8];
+            pc += 2;
+            break;
+
+        case 0xF055: // 0xFX55: Store registers starting from V0 to VX into
+                     // memory
+            for(int i = 0; i <= end; i++) {
+                memory[I + i] = V[i];
+            }
+
+            pc += 2;
+            break;
+
+        case 0xF065: // 0xFX65: Load registers into V0 to VX from memory
+            for(int i = 0; i <= end; i++) {
+                V[i] = memory[I + i];
+            }
+
+            pc += 2;
+            break;
+        }
         break;
 
     default:
