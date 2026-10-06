@@ -40,6 +40,9 @@ unsigned char fontset[80] = {
 Stack stack;
 unsigned short prevAddr;
 
+unsigned short VX;
+unsigned short VY;
+
 void chip8_initialise() {
     pc = 0x200;
     opcode = 0;
@@ -110,7 +113,9 @@ bool load_rom(const char *file_path) {
 
     rewind(rom);
 
-    if(rom_size > 512 || rom_size <= 0) {
+    if(rom_size > 3232 ||
+       rom_size <= 0) { // 3232 is 4KB max size minus 512 reserved space and
+                        // space for display refresh, variables, stack etc
         printf("ROM size error, max size 512b\n");
         fclose(rom);
         return false;
@@ -149,7 +154,6 @@ void chip8_cycle() {
 
             drawFlag = true; // set display to be redrawn
             pc += 2;
-            printf("Clear Screen ran\n");
             break;
 
         case 0x00EE: // 0x00EE: Return from subroutine
@@ -161,7 +165,6 @@ void chip8_cycle() {
 
     case 0x1000: // 0x1NNN: Jump
         pc = opcode & 0x0FFF;
-        printf("JUMPED to %d\n", pc);
         break;
 
     case 0x2000: // 0x2NNN: Call subroutine at NNN
@@ -169,14 +172,14 @@ void chip8_cycle() {
         pc = opcode & 0x0FFF;
         break;
 
-    case 0x3000: // 0x3NNN: Skip instruction if VX == NN
+    case 0x3000: // 0x3XNN: Skip instruction if VX == NN
         if((V[(opcode & 0x0F00) >> 8]) == (opcode & 0x00FF)) {
             pc += 2;
         }
         pc += 2;
         break;
 
-    case 0x4000: // 0x4NNN: Skip instruction if VX != NN
+    case 0x4000: // 0x4XNN: Skip instruction if VX != NN
         if((V[(opcode & 0x0F00) >> 8]) != (opcode & 0x00FF)) {
             pc += 2;
         }
@@ -198,6 +201,96 @@ void chip8_cycle() {
     case 0x7000: // 0x7XNN: Add NN to register V[X]
         V[(opcode & 0x0F00) >> 8] += opcode & 0x00FF;
         pc += 2;
+        break;
+
+    case 0x8000: // 0x8 series of instructions to perform logical/arithmetic
+                 // functions
+        VX = V[(opcode & 0x0F00) >> 8];
+        VY = V[(opcode & 0x00F0) >> 4];
+        switch(opcode & 0xF00F) {
+
+        case 0x8000: // 0x8XY0: Set VX to value of VY
+            VX = VY;
+            V[(opcode & 0x0F00) >> 8] = VX;
+            pc += 2;
+            break;
+
+        case 0x8001: // 0x8XY1: Set VX to binary OR of VX and VY
+            VX |= VY;
+            V[(opcode & 0x0F00) >> 8] = VX;
+            pc += 2;
+            break;
+
+        case 0x8002: // 0x8XY2: Set VX to binary AND of VX and VY
+            VX &= VY;
+            V[(opcode & 0x0F00) >> 8] = VX;
+            pc += 2;
+            break;
+
+        case 0x8003: // 0x8XY3: Set VX to binary XOR of VX and VY
+            VX ^= VY;
+            V[(opcode & 0x0F00) >> 8] = VX;
+            pc += 2;
+            break;
+
+        case 0x8004: // 0x8XY4: Add value of VY to VX, if VX overflows set VF =
+                     // 1
+            V[0xF] = 0;
+            if((VX + VY) > 255) {
+                V[0xF] = 1;
+            }
+
+            VX += VY;
+            V[(opcode & 0x0F00) >> 8] = VX;
+            pc += 2;
+            break;
+
+        case 0x8005: // 0x8XY5: Subtract value of VY from VX and store in VX
+            V[0xF] = 0;
+            if(VX >= VY) {
+                V[0xF] = 1;
+            }
+
+            VX = VX - VY;
+            V[(opcode & 0x0F00) >> 8] = VX;
+            pc += 2;
+            break;
+
+        case 0x8006: // 0x8XY6: Set VX = VY and shift the value of VX one bit to the right
+            VX = VY >> 1;
+            V[(opcode & 0x0F00) >> 8] = VX;
+
+            V[0xF] = 0;
+            if((VY & 1) == 1){
+                V[0xF] = 1;
+            }
+            pc += 2;
+            break;
+
+
+        case 0x8007: // 0x8XY7: Subtract value of VX from VY and store in VX
+            V[0xF] = 0;
+            if(VY >= VX) {
+                V[0xF] = 1;
+            }
+
+            VX = VY - VX;
+            V[(opcode & 0x0F00) >> 8] = VX;
+            pc += 2;
+            break;
+
+        case 0x800E: // 0x8XYE:  Set VX = VY and shift the value of VX one bit to the left
+         VX = VY << 1;
+            V[(opcode & 0x0F00) >> 8] = VX;
+
+            V[0xF] = 0;
+            if((VY & 1) == 1){
+                V[0xF] = 1;
+            }
+            pc += 2;
+            break;
+            break;
+        }
         break;
 
     case 0x9000: // 0x9XY0: Skip instruction if VX != VY

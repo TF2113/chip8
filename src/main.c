@@ -54,10 +54,11 @@ void drawGraphics() {
                                   PIXEL_SCALE};
                 SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                 SDL_RenderFillRect(renderer, &pixel);
-                SDL_RenderPresent(renderer);
+                
             }
         }
     }
+    SDL_RenderPresent(renderer);
     SDL_UpdateWindowSurface(window);
 }
 

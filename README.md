@@ -14,5 +14,5 @@ Tobias V.I Langhoff for the great guide<br>
 https://tobiasvl.github.io/blog/write-a-chip-8-emulator/<br>
 https://github.com/tobiasvl
 
-Test Rom from @corax89 <br>
-https://github.com/corax89/chip8-test-rom
+Test Rom from @Timendus <br>
+https://github.com/Timendus/chip8-test-suite
