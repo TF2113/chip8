@@ -113,7 +113,9 @@ bool load_rom(const char *file_path) {
 
     rewind(rom);
 
-    if(rom_size > 512 || rom_size <= 0) {
+    if(rom_size > 3232 ||
+       rom_size <= 0) { // 3232 is 4KB max size minus 512 reserved space and
+                        // space for display refresh, variables, stack etc
         printf("ROM size error, max size 512b\n");
         fclose(rom);
         return false;
@@ -170,14 +172,14 @@ void chip8_cycle() {
         pc = opcode & 0x0FFF;
         break;
 
-    case 0x3000: // 0x3NNN: Skip instruction if VX == NN
+    case 0x3000: // 0x3XNN: Skip instruction if VX == NN
         if((V[(opcode & 0x0F00) >> 8]) == (opcode & 0x00FF)) {
             pc += 2;
         }
         pc += 2;
         break;
 
-    case 0x4000: // 0x4NNN: Skip instruction if VX != NN
+    case 0x4000: // 0x4XNN: Skip instruction if VX != NN
         if((V[(opcode & 0x0F00) >> 8]) != (opcode & 0x00FF)) {
             pc += 2;
         }
