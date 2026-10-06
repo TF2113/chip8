@@ -289,7 +289,6 @@ void chip8_cycle() {
             }
             pc += 2;
             break;
-            break;
         }
         break;
 
