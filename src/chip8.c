@@ -256,17 +256,17 @@ void chip8_cycle() {
             pc += 2;
             break;
 
-        case 0x8006: // 0x8XY6: Set VX = VY and shift the value of VX one bit to the right
+        case 0x8006: // 0x8XY6: Set VX = VY and shift the value of VX one bit to
+                     // the right
             VX = VY >> 1;
             V[(opcode & 0x0F00) >> 8] = VX;
 
             V[0xF] = 0;
-            if((VY & 1) == 1){
+            if((VY & 1) == 1) {
                 V[0xF] = 1;
             }
             pc += 2;
             break;
-
 
         case 0x8007: // 0x8XY7: Subtract value of VX from VY and store in VX
             V[0xF] = 0;
@@ -279,12 +279,13 @@ void chip8_cycle() {
             pc += 2;
             break;
 
-        case 0x800E: // 0x8XYE:  Set VX = VY and shift the value of VX one bit to the left
-         VX = VY << 1;
+        case 0x800E: // 0x8XYE:  Set VX = VY and shift the value of VX one bit
+                     // to the left
+            VX = VY << 1;
             V[(opcode & 0x0F00) >> 8] = VX;
 
             V[0xF] = 0;
-            if((VY & 1) == 1){
+            if((VY & 1) == 1) {
                 V[0xF] = 1;
             }
             pc += 2;
