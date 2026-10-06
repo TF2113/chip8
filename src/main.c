@@ -11,6 +11,11 @@ const int SCREEN_WIDTH = 64;
 const int SCREEN_HEIGHT = 32;
 const int PIXEL_SCALE = 10; // increase scale for modern displays
 
+// keypad, why is it like that
+unsigned char keys[16] = {SDLK_x, SDLK_1, SDLK_2, SDLK_3, SDLK_q, SDLK_w,
+                          SDLK_e, SDLK_a, SDLK_s, SDLK_d, SDLK_z, SDLK_c,
+                          SDLK_4, SDLK_r, SDLK_f, SDLK_v};
+
 // SDL declarations
 SDL_Window *window = NULL;
 SDL_Renderer *renderer = NULL;
@@ -47,6 +52,8 @@ bool create_window_and_renderer(void) {
 }
 
 void drawGraphics() {
+    SDL_SetRenderDrawColor(renderer, 9, 56, 49, 255);
+    SDL_RenderClear(renderer);
     for(int y = 0; y < SCREEN_HEIGHT; y++) {
         for(int x = 0; x < SCREEN_WIDTH; x++) {
             if(gfx[y * SCREEN_WIDTH + x] != 0) {
@@ -54,12 +61,10 @@ void drawGraphics() {
                                   PIXEL_SCALE};
                 SDL_SetRenderDrawColor(renderer, 234, 151, 56, 255);
                 SDL_RenderFillRect(renderer, &pixel);
-                
             }
         }
     }
     SDL_RenderPresent(renderer);
-    SDL_UpdateWindowSurface(window);
 }
 
 int main(int argc, char *argv[]) {
@@ -87,12 +92,30 @@ int main(int argc, char *argv[]) {
     SDL_Event event;
     int quit = 0;
     while(!quit) {
+        chip8_cycle();
+
         while(SDL_PollEvent(&event) != 0) {
-            if(event.type == SDL_QUIT) {
+            if(event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE) {
                 quit = 1;
             }
+
+            // Thanks again James
+            if(event.type == SDL_KEYDOWN) {
+                for(int i = 0; i < 16; i++) {
+                    if(event.key.keysym.sym == keys[i]) {
+                        keypad[i] = 1;
+                    }
+                }
+            }
+
+            if(event.type == SDL_KEYUP) {
+                for(int i = 0; i < 16; i++) {
+                    if(event.key.keysym.sym == keys[i]) {
+                        keypad[i] = 0;
+                    }
+                }
+            }
         }
-        chip8_cycle();
 
         if(drawFlag) {
             drawFlag = false;
