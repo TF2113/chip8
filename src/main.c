@@ -40,7 +40,7 @@ bool create_window_and_renderer(void) {
         return false;
     }
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_SetRenderDrawColor(renderer, 9, 56, 49, 255);
     SDL_RenderClear(renderer);
 
     return true;
@@ -52,7 +52,7 @@ void drawGraphics() {
             if(gfx[y * SCREEN_WIDTH + x] != 0) {
                 SDL_Rect pixel = {x * PIXEL_SCALE, y * PIXEL_SCALE, PIXEL_SCALE,
                                   PIXEL_SCALE};
-                SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+                SDL_SetRenderDrawColor(renderer, 234, 151, 56, 255);
                 SDL_RenderFillRect(renderer, &pixel);
                 
             }

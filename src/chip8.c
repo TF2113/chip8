@@ -336,8 +336,32 @@ void chip8_cycle() {
         unsigned short end = (opcode & 0x0F00) >> 8;
         switch(opcode & 0xF0FF) {
 
+        case 0xF007: // 0xFX07: Set VX to current value of delay timer
+            V[(opcode & 0x0F00) >> 8] = delay_timer;
+            pc += 2;
+            break;
+
+        case 0xF015: // 0xFX15: Set delay timer to current value of VX
+            delay_timer = V[(opcode & 0x0F00) >> 8];
+            pc += 2;
+            break;
+
+        case 0xF018: // 0xFX18: Set sound timer to current value of VX
+            sound_timer = V[(opcode & 0x0F00) >> 8];
+            pc += 2;
+            break;
+
         case 0xF01E: // 0xFX1E: Add value of VX to I
             I += V[(opcode & 0x0F00) >> 8];
+            pc += 2;
+            break;
+
+        case 0xF033: // 0xFX33: Convert value of VX into 3 digits, e.g 255 in 2,
+                     // 5, 5, and store into memory starting at I
+            memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
+            memory[I+1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
+            memory[I+2] = (V[(opcode & 0x0F00) >> 8] % 10);
+
             pc += 2;
             break;
 
