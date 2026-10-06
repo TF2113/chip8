@@ -359,8 +359,8 @@ void chip8_cycle() {
         case 0xF033: // 0xFX33: Convert value of VX into 3 digits, e.g 255 in 2,
                      // 5, 5, and store into memory starting at I
             memory[I] = V[(opcode & 0x0F00) >> 8] / 100;
-            memory[I+1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
-            memory[I+2] = (V[(opcode & 0x0F00) >> 8] % 10);
+            memory[I + 1] = (V[(opcode & 0x0F00) >> 8] / 10) % 10;
+            memory[I + 2] = (V[(opcode & 0x0F00) >> 8] % 10);
 
             pc += 2;
             break;
