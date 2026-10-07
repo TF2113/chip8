@@ -2,7 +2,7 @@
 
 Chip8 implemented in C, using SDL2 library for handling the window and inputs <br>
 Few issues remain, flickering display when sprites in motion, collison detection is wonky. <br> 
-Built over ~9 days to learn basic emulation development and further low-level development knowledge without AI assistance, only online resources and my own brain.
+Built over ~10 days to learn basic emulation development and further low-level development knowledge without AI assistance, only online resources and my own brain.
 
 <br>
 
